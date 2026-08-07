@@ -38,6 +38,7 @@ PAPER_REVIEW_REQUIRED_REFS = [
     "evaluator_review_principles.md",
     "academic_style_revision.md",
     "evidence_claim_discipline.md",
+    "supervisor_review_lens.md",
 ]
 ACADEMIC_STYLE_AUTHORITY_PHRASE = "论文正文语言与语义规范的最高权威"
 
@@ -80,6 +81,7 @@ REQUIRED_GUARDRAILS = {
     "shared-references/common_figure_requirements.md": ["Python论文制图与去模板化风格", "12—18 pt之间调整", "深色、高饱和度、高对比度", "三维饼图和三维柱状图可以采用", "常见AI模板痕迹"],
     "paper-writing/references/competition_prose_style.md": ["逻辑先行，叙述自然", "准确、克制、有边界", "分节叙述契约", "去模板化与润色检查", "交付前自检"],
     "shared-references/user_delivery_contract.md": ["默认使用MATLAB", "MATLAB R2023b", "未经用户明确同意", "12—18 pt之间调整", "三维饼图和三维柱状图不是禁用项"],
+    "shared-references/supervisor_review_lens.md": ["定位与权威边界", "四个必检维度", "不可直接迁移的外部约束", "不为任何结论提供证据"],
     "shared-references/rule_authority_index.md": ["常驻基线", "规则权威来源", "按需加载矩阵", "不得无任务地批量加载全部历史文件"],
 }
 
@@ -275,6 +277,7 @@ def validate(root: Path) -> dict:
         "agent_runtime_protocol.md",
         "artifact_build_release_protocol.md",
         "rule_authority_index.md",
+        "supervisor_review_lens.md",
     }
     existing = {p.name for p in (root / "shared-references").glob("*.md")}
     checks += len(required_refs)

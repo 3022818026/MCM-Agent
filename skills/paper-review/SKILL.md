@@ -1,6 +1,6 @@
 ---
 name: paper-review
-description: 独立审核完整数学建模交付物，检查小问覆盖、模型与代码一致、数字来源、历史案例污染、数据泄漏、过拟合、模型比较、公平评价、图表、摘要、引用、版式、匿名、AI披露和可复现性。当用户要求验收、评审、找问题或提交前检查时使用；只需直接写稿、改代码、生成图表或尚无完整交付物时不要使用。
+description: 独立审核完整数学建模交付物，检查小问覆盖、模型与代码一致、数字来源、历史案例污染、数据泄漏、过拟合、模型比较、公平评价、图表、摘要、引用、版式、匿名、AI披露、可复现性及外部学术终审规范的可迁移要求。当用户要求验收、评审、找问题或提交前检查时使用；只需直接写稿、改代码、生成图表或尚无完整交付物时不要使用。
 ---
 
 # 论文独立审核
@@ -19,7 +19,7 @@ description: 独立审核完整数学建模交付物，检查小问覆盖、模�
 
 ## 开始前读取内容
 
-读取题面、附件、代码、结果注册表、评价报告、图表清单、正文、摘要、参考文献、附录和当届规则。先按`../shared-references/rule_authority_index.md`读取常驻基线；本Skill专项必读`paper_integrity_gate.md`、`evaluator_review_principles.md`、`academic_style_revision.md`和`evidence_claim_discipline.md`。`academic_style_revision.md`是全文语言与语义审查的最高标准，必须审查语义锁、术语稳定性、主张边界、信息密度和模板化表达。仅在发现对应风险时，再读取`common_writing_requirements.md`、`common_figure_requirements.md`、`../paper-writing/references/competition_prose_style.md`、`common_mistakes.md`和`codex_project_context_rules.md`。
+读取题面、附件、代码、结果注册表、评价报告、图表清单、正文、摘要、参考文献、附录和当届规则。先按`../shared-references/rule_authority_index.md`读取常驻基线；本Skill专项必读`paper_integrity_gate.md`、`evaluator_review_principles.md`、`academic_style_revision.md`、`evidence_claim_discipline.md`和`supervisor_review_lens.md`。`academic_style_revision.md`是全文语言与语义审查的最高标准，必须审查语义锁、术语稳定性、主张边界、信息密度和模板化表达；`supervisor_review_lens.md`补充复核用户指定外部学术规范中可迁移的语义忠实、论证链、分节职责、引用和图表要求，不能覆盖本地权威规则或用户交付契约。仅在发现对应风险时，再读取`common_writing_requirements.md`、`common_figure_requirements.md`、`../paper-writing/references/competition_prose_style.md`、`common_mistakes.md`和`codex_project_context_rules.md`。
 
 ## 历史记忆使用规则
 
@@ -54,7 +54,7 @@ description: 独立审核完整数学建模交付物，检查小问覆盖、模�
 
 ## 质量检查
 
-每个问题有证据位置和影响；建议不篡改结果；所有小问和关键数字均完成反查；格式检查基于当前规则；全文按`academic_style_revision.md`复核语义锁、术语、主张边界和模板化语言；状态与否决项一致。
+每个问题有证据位置和影响；建议不篡改结果；所有小问和关键数字均完成反查；格式检查基于当前规则；全文按`academic_style_revision.md`复核语义锁、术语、主张边界和模板化语言，并按`supervisor_review_lens.md`完成语义忠实、论证链、分节职责、引用和图表的补充终审；状态与否决项一致。
 
 ## 禁止事项
 
@@ -80,11 +80,18 @@ description: 独立审核完整数学建模交付物，检查小问覆盖、模�
 4. 数字、公式、符号、图表和引用一致性；
 5. 方法适配、算法实用性、鲁棒性、重复一致性和可靠性重构；
 6. 数据泄漏、样本外评价、稳健性、敏感性和失效条件；
-7. 结构、学术表达、结论边界和模板化语言；
+7. 结构、学术表达、结论边界、模板化语言及外部学术终审规范的可迁移复核；
 8. 匿名、AI披露、附录、页数和最终PDF视觉验收；
 9. 修订后的独立复核。
 
 运行`scripts/audit_paper_integrity.py`完成可自动化初筛；审查PDF时该脚本需要`pypdf`，依赖声明见`scripts/requirements.txt`，安装前仍须取得用户授权。脚本只能检查其覆盖的文本和结构项目，其余项目按`../shared-references/evaluator_review_principles.md`人工审查。评阅建议中的题目专属数值、方法偏好和数据限制不得迁移为通用答案。
+
+## 外部学术规范的可迁移复核
+
+- 完整论文终审必须读取`../shared-references/supervisor_review_lens.md`，逐项复核语义是否忠实于提交包、主张是否与证据相称、论证链是否自包含、各节是否各司其职，以及引用与图表是否经得起脱离正文的独立阅读。
+- 当用户提供可访问的 Supervisor-Skills 根目录时，必须对当前风险复读其`paper-polish`、`paper-writer`、`pre-submission-reviewer`或`figure-designer`中的相关原始规范；其作用仅是核对本地透镜，不把外部模板、案例、文献、数值、文件路径或工具链带入论文。
+- 不迁移顶会/期刊的固定章节、摘要/段落/图表/数据集数量、英文专属语法禁令、LaTeX 命令或研究型基准/消融要求。数学建模论文的语言、Word版式、图表和交付方式始终以用户、当届规则与本地权威来源为准。
+- 每项由本透镜发现的问题仍按本Skill的阻断、高风险和改进项分级，必须登记本地证据位置、影响、责任Skill、修复动作和复核证据；外部规范本身不构成当前论文结论的证据。
 
 ## 信息密度与竞赛化专项审查
 

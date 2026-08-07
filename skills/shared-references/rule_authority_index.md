@@ -17,6 +17,7 @@
 | 论文图表任务、视觉自审和比较图选择 | `common_figure_requirements.md` | 制图 | 正文只解释图表结论 |
 | 论文结构、摘要和信息归属 | `common_writing_requirements.md`与`paper-writing/references/competition_prose_style.md` | 写作 | 只规定章节功能、信息位置和竞赛化叙述契约；不得覆盖语言总标准 |
 | 论文正文的语言质量、语义锁和修订边界 | `academic_style_revision.md` | 写作、终审 | 论文正文语言与语义规范的最高权威；结构建议、历史范例和表达骨架均不得覆盖 |
+| 外部学术终审经验的可迁移检查 | `supervisor_review_lens.md` | 终审 | 仅补充语义忠实、论证链、分节职责、引用和图表的审查透镜；不作为当前题目证据、模板或硬性竞赛要求 |
 | Word公式输出 | `paper-writing/references/word_formula_output_protocol.md` | 写作 | 不在其他文件维护命令白名单 |
 | 续写前检查、数字/符号/引用/版式门禁 | `paper_integrity_gate.md` | 写作、终审 | 其他Skill只触发回退 |
 | 阶段推进与失败回退 | `competition_workflow.md` | 全程 | 不替代各阶段的科学判断 |
@@ -35,7 +36,7 @@
 | `model-evaluation` | `evaluator_review_principles.md`、`model_selection_and_evaluation.md`、`quality_gate_protocol.md` | 多模型比较、外部事实、特殊题型或历史风险 |
 | `figure-generation` | `common_figure_requirements.md`、`quality_gate_protocol.md` | 正文位置、结果传播、复杂比较统计或参考图复现 |
 | `paper-writing` | `common_writing_requirements.md`、`paper_integrity_gate.md`、`academic_style_revision.md`、`evidence_claim_discipline.md`和`paper-writing/references/word_formula_output_protocol.md` | 模型比较、外部事实或历史句法参考 |
-| `paper-review` | `paper_integrity_gate.md`、`evaluator_review_principles.md`、`academic_style_revision.md`、`quality_gate_protocol.md`、`evidence_claim_discipline.md` | 图表、数据或代码专项复核 |
+| `paper-review` | `paper_integrity_gate.md`、`evaluator_review_principles.md`、`academic_style_revision.md`、`quality_gate_protocol.md`、`evidence_claim_discipline.md`、`supervisor_review_lens.md` | 图表、数据或代码专项复核；用户提供外部学术规范目录时复读相关原始规则 |
 
 读取条件不明确时，优先读取相应权威来源；不得为了省上下文跳过常驻基线，也不得无任务地批量加载全部历史文件。
 
