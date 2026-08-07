@@ -15,7 +15,8 @@
 | 模型比较的适用与放弃条件 | `model_comparison_decision_rules.md` | 设计、评价 | 不固定比较数量 |
 | 代码—模型映射、结果注册、传播与支撑材料 | `common_code_requirements.md` | 实现 | 写作、图表和审核只调用登记结果 |
 | 论文图表任务、视觉自审和比较图选择 | `common_figure_requirements.md` | 制图 | 正文只解释图表结论 |
-| 论文结构、摘要、语言和信息归属 | `common_writing_requirements.md`、`academic_style_revision.md`与`paper-writing/references/competition_prose_style.md` | 写作 | 不重复制定版式细节 |
+| 论文结构、摘要和信息归属 | `common_writing_requirements.md`与`paper-writing/references/competition_prose_style.md` | 写作 | 只规定章节功能、信息位置和竞赛化叙述契约；不得覆盖语言总标准 |
+| 论文正文的语言质量、语义锁和修订边界 | `academic_style_revision.md` | 写作、终审 | 论文正文语言与语义规范的最高权威；结构建议、历史范例和表达骨架均不得覆盖 |
 | Word公式输出 | `paper-writing/references/word_formula_output_protocol.md` | 写作 | 不在其他文件维护命令白名单 |
 | 续写前检查、数字/符号/引用/版式门禁 | `paper_integrity_gate.md` | 写作、终审 | 其他Skill只触发回退 |
 | 阶段推进与失败回退 | `competition_workflow.md` | 全程 | 不替代各阶段的科学判断 |
@@ -33,8 +34,8 @@
 | `model-implementation` | `common_code_requirements.md`、`paper_integrity_gate.md`、`quality_gate_protocol.md` | 特殊模型原理、复杂失败诊断或结论传播 |
 | `model-evaluation` | `evaluator_review_principles.md`、`model_selection_and_evaluation.md`、`quality_gate_protocol.md` | 多模型比较、外部事实、特殊题型或历史风险 |
 | `figure-generation` | `common_figure_requirements.md`、`quality_gate_protocol.md` | 正文位置、结果传播、复杂比较统计或参考图复现 |
-| `paper-writing` | `common_writing_requirements.md`、`paper_integrity_gate.md`、公式协议、`evidence_claim_discipline.md` | 学术表达、模型比较、外部事实或历史句法参考 |
-| `paper-review` | `paper_integrity_gate.md`、`evaluator_review_principles.md`、`quality_gate_protocol.md`、`evidence_claim_discipline.md` | 图表、写作、数据或代码专项复核 |
+| `paper-writing` | `common_writing_requirements.md`、`paper_integrity_gate.md`、`academic_style_revision.md`、`evidence_claim_discipline.md`和`paper-writing/references/word_formula_output_protocol.md` | 模型比较、外部事实或历史句法参考 |
+| `paper-review` | `paper_integrity_gate.md`、`evaluator_review_principles.md`、`academic_style_revision.md`、`quality_gate_protocol.md`、`evidence_claim_discipline.md` | 图表、数据或代码专项复核 |
 
 读取条件不明确时，优先读取相应权威来源；不得为了省上下文跳过常驻基线，也不得无任务地批量加载全部历史文件。
 

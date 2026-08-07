@@ -26,6 +26,21 @@ PERSISTENT_BASELINE = [
     "quality_gate_protocol.md",
     "user_delivery_contract.md",
 ]
+PAPER_WRITING_REQUIRED_REFS = [
+    "common_writing_requirements.md",
+    "paper_integrity_gate.md",
+    "academic_style_revision.md",
+    "evidence_claim_discipline.md",
+    "word_formula_output_protocol.md",
+]
+PAPER_REVIEW_REQUIRED_REFS = [
+    "paper_integrity_gate.md",
+    "evaluator_review_principles.md",
+    "academic_style_revision.md",
+    "evidence_claim_discipline.md",
+]
+ACADEMIC_STYLE_AUTHORITY_PHRASE = "论文正文语言与语义规范的最高权威"
+
 REQUIRED_SECTION_GROUPS = [
     ("任务目标",),
     ("开始前读取", "开始前读取内容", "读取范围与证据边界"),
@@ -52,6 +67,7 @@ FORBIDDEN_DEFAULTS = [
 ]
 
 REQUIRED_GUARDRAILS = {
+    \
     "shared-references/competition_workflow.md": ["短指令意图补全与应急模式", "覆盖范围", "质量标准"],
     "shared-references/common_modeling_principles.md": ["题面结构解析与混合题型", "自动拆题结果都只是候选解析", "关键措辞台账", "题面措辞→数学对象"],
     "shared-references/common_code_requirements.md": ["模型—代码反向核对", "原始字段到代码变量", "跨平台调用方式", "MATLAB分析与Python绘图协议", "main.m", "rng", "paper_plot_library.py"],
@@ -108,10 +124,70 @@ def _validate_persistent_baseline(root: Path, failures: list[str]) -> int:
         if agents_files != index_files:
             failures.append(f"persistent baseline mismatch: {label}={agents_files}; rule_authority_index.md={index_files}")
     return 1 + 2 * len(agent_paths)
+def _validate_paper_writing_reference_contract(root: Path, failures: list[str]) -> int:
+    skill_path = root / "paper-writing" / "SKILL.md"
+    index_path = root / "shared-references" / "rule_authority_index.md"
+    skill_content = skill_path.read_text(encoding="utf-8") if skill_path.exists() else ""
+    index_content = index_path.read_text(encoding="utf-8") if index_path.exists() else ""
+    row = re.search(r"(?m)^\|\s*`paper-writing`\s*\|([^|]*)\|", index_content)
+    checks = 0
+
+    for reference in PAPER_WRITING_REQUIRED_REFS:
+        checks += 1
+        if reference not in skill_content:
+            failures.append(f"paper-writing/SKILL.md: missing required writing reference: {reference}")
+    checks += 1
+    if ACADEMIC_STYLE_AUTHORITY_PHRASE not in skill_content:
+        failures.append("paper-writing/SKILL.md: academic_style_revision.md is not declared as the language-and-semantics authority")
+
+    checks += 1
+    if row is None:
+        failures.append("shared-references/rule_authority_index.md: missing paper-writing matrix row")
+    else:
+        specialist_reads = row.group(1)
+        for reference in PAPER_WRITING_REQUIRED_REFS:
+            checks += 1
+            if reference not in specialist_reads:
+                failures.append(
+                    "shared-references/rule_authority_index.md: paper-writing "
+                    f"specialist reads missing {reference}"
+                )
+    return checks
+
+
+def _validate_paper_review_reference_contract(root: Path, failures: list[str]) -> int:
+    skill_path = root / "paper-review" / "SKILL.md"
+    index_path = root / "shared-references" / "rule_authority_index.md"
+    skill_content = skill_path.read_text(encoding="utf-8") if skill_path.exists() else ""
+    index_content = index_path.read_text(encoding="utf-8") if index_path.exists() else ""
+    row = re.search(r"(?m)^\|\s*`paper-review`\s*\|([^|]*)\|", index_content)
+    checks = 0
+
+    for reference in PAPER_REVIEW_REQUIRED_REFS:
+        checks += 1
+        if reference not in skill_content:
+            failures.append(f"paper-review/SKILL.md: missing required review reference: {reference}")
+
+    checks += 1
+    if row is None:
+        failures.append("shared-references/rule_authority_index.md: missing paper-review matrix row")
+    else:
+        specialist_reads = row.group(1)
+        for reference in PAPER_REVIEW_REQUIRED_REFS:
+            checks += 1
+            if reference not in specialist_reads:
+                failures.append(
+                    "shared-references/rule_authority_index.md: paper-review "
+                    f"specialist reads missing {reference}"
+                )
+    return checks
+
 def validate(root: Path) -> dict:
     failures: list[str] = []
     checks = 0
     checks += _validate_persistent_baseline(root, failures)
+    checks += _validate_paper_writing_reference_contract(root, failures)
+    checks += _validate_paper_review_reference_contract(root, failures)
     for name in SKILLS:
         skill_dir = root / name
         skill_file = skill_dir / "SKILL.md"

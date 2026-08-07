@@ -19,7 +19,7 @@ description: 独立审核完整数学建模交付物，检查小问覆盖、模�
 
 ## 开始前读取内容
 
-读取题面、附件、代码、结果注册表、评价报告、图表清单、正文、摘要、参考文献、附录和当届规则。先按`../shared-references/rule_authority_index.md`读取常驻基线；本Skill专项必读`paper_integrity_gate.md`和`evaluator_review_principles.md`。仅在发现对应风险时，再读取`common_writing_requirements.md`、`common_figure_requirements.md`、`academic_style_revision.md`、`../paper-writing/references/competition_prose_style.md`、`common_mistakes.md`和`codex_project_context_rules.md`。
+读取题面、附件、代码、结果注册表、评价报告、图表清单、正文、摘要、参考文献、附录和当届规则。先按`../shared-references/rule_authority_index.md`读取常驻基线；本Skill专项必读`paper_integrity_gate.md`、`evaluator_review_principles.md`、`academic_style_revision.md`和`evidence_claim_discipline.md`。`academic_style_revision.md`是全文语言与语义审查的最高标准，必须审查语义锁、术语稳定性、主张边界、信息密度和模板化表达。仅在发现对应风险时，再读取`common_writing_requirements.md`、`common_figure_requirements.md`、`../paper-writing/references/competition_prose_style.md`、`common_mistakes.md`和`codex_project_context_rules.md`。
 
 ## 历史记忆使用规则
 
@@ -54,7 +54,7 @@ description: 独立审核完整数学建模交付物，检查小问覆盖、模�
 
 ## 质量检查
 
-每个问题有证据位置和影响；建议不篡改结果；所有小问和关键数字均完成反查；格式检查基于当前规则；状态与否决项一致。
+每个问题有证据位置和影响；建议不篡改结果；所有小问和关键数字均完成反查；格式检查基于当前规则；全文按`academic_style_revision.md`复核语义锁、术语、主张边界和模板化语言；状态与否决项一致。
 
 ## 禁止事项
 

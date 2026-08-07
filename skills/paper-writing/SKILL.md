@@ -19,7 +19,11 @@ description: 基于当前赛题、已运行代码、结果注册表、模型评�
 
 ## 开始前读取内容
 
-读取完整题面、当前代码、结果注册表、评价报告、图表清单、最新竞赛规则和用户风格要求。先按`../shared-references/rule_authority_index.md`读取常驻基线；本Skill专项必读`common_writing_requirements.md`、`paper_integrity_gate.md`和`references/word_formula_output_protocol.md`。起草、续写、结构重排或语言自然化时，完整读取`../shared-references/academic_style_revision.md`和`references/competition_prose_style.md`；需要仿写章节结构或核对“问题重述—模型建立—求解—结果—验证”叙述链时，读取`references/example_snippets.md`，但只迁移结构和表达，不迁移其中虚构数字。模型比较或历史表达参考被触发时，再读取`paper_model_comparison_writing.md`和`historical_case_lessons.md`。
+读取完整题面、当前代码、结果注册表、评价报告、图表清单、最新竞赛规则和用户风格要求。先按`../shared-references/rule_authority_index.md`读取常驻基线；本Skill专项必读`common_writing_requirements.md`、`paper_integrity_gate.md`、`academic_style_revision.md`、`evidence_claim_discipline.md`和`references/word_formula_output_protocol.md`。起草、续写、结构重排或语言自然化时，先按`../shared-references/academic_style_revision.md`建立语义锁，再完整读取`references/competition_prose_style.md`；需要仿写章节结构或核对“问题重述—模型建立—求解—结果—验证”叙述链时，读取`references/example_snippets.md`，但只迁移结构和表达，不迁移其中虚构数字。模型比较或历史表达参考被触发时，再读取`paper_model_comparison_writing.md`和`historical_case_lessons.md`。
+
+## 正文语言与语义总标准
+
+`../shared-references/academic_style_revision.md`是论文正文语言与语义规范的最高权威。每次起草、续写、重写、润色或定稿前，先建立并核对语义锁；任何语言调整不得改变题目事实、数字、单位、公式、模型关系、引用、图表编号或结论边界。`common_writing_requirements.md`只规定结构与信息归属，`competition_prose_style.md`只提供竞赛化叙述契约和表达骨架；两者均不得覆盖本规范的语义锁、准确、克制和可核验要求。
 
 ## 历史记忆使用规则
 
