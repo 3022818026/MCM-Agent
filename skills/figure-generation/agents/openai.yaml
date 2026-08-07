@@ -1,0 +1,4 @@
+interface:
+  display_name: "论文图表生成"
+  short_description: "依据真实数据与核验结果生成清晰、严谨、适合打印的论文图表"
+  default_prompt: "使用 $figure-generation 根据已核验结果生成论文级图表，并检查可读性、单位和版面效果。"

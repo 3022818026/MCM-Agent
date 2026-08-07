@@ -1,0 +1,4 @@
+interface:
+  display_name: "模型评价"
+  short_description: "独立检验模型的泛化、稳健性、敏感性、可靠性和实际适用边界"
+  default_prompt: "使用 $model-evaluation 对已实现模型开展独立、公平且可复现的评价。"

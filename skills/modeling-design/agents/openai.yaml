@@ -1,0 +1,4 @@
+interface:
+  display_name: "建模设计"
+  short_description: "覆盖赛题拆解、候选路线比较、验证设计与最终模型选择决策"
+  default_prompt: "使用$modeling-design分析这道数学建模赛题，给出有证据支撑的模型路线与验证设计。"

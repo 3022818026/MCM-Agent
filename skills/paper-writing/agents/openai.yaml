@@ -1,0 +1,4 @@
+interface:
+  display_name: "数学建模论文写作"
+  short_description: "涵盖论文正文、摘要、关键词、结论与Word成稿的一致性写作"
+  default_prompt: "使用$paper-writing基于已核验结果和图表撰写或修订数学建模论文。"

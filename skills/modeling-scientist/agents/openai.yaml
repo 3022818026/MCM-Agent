@@ -1,0 +1,4 @@
+interface:
+  display_name: "建模科学决策总控"
+  short_description: "先审题与证据，再选择可复现的模型路线"
+  default_prompt: "使用 $modeling-scientist 统筹当前数学建模或机器学习任务：先审查问题、数据、资源和竞赛约束，再决定是否比较模型、使用深度学习、GPU 或自动调参，并输出验证协议与专项 Skill 执行路径。"

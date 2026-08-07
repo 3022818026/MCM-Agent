@@ -1,0 +1,4 @@
+interface:
+  display_name: "数据准备"
+  short_description: "覆盖数据结构审查、质量诊断、清洗转换、特征构造与防泄漏划分"
+  default_prompt: "使用$data-preparation审查并可复现地准备我提供的数学建模数据。"
