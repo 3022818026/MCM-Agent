@@ -95,7 +95,7 @@ leg = ax.legend(
 
 fig.tight_layout(pad=0.8)
 fig.savefig(
-    '_reproduction_path("line_aime_repro.png")',
+    _reproduction_path("line_aime_repro.png"),
     dpi=300, facecolor='white',
 )
 plt.close(fig)

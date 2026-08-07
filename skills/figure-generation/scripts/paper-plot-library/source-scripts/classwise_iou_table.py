@@ -216,7 +216,7 @@ def main() -> None:
     )
 
     fig.savefig(
-        "_reproduction_path("classwise_iou_repro.png")",
+        _reproduction_path("classwise_iou_repro.png"),
         dpi=300,
         facecolor="white",
         bbox_inches="tight",

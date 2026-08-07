@@ -72,8 +72,8 @@ def _extract_agents_persistent_baseline(content: str) -> list[str] | None:
     marker = "还必须完整读取："
     if marker not in content:
         return None
-    bullet_block = content.split(marker, 1)[1].split("\n\n", 1)[0]
-    files = re.findall(r"`(?:shared-references/)?([^`/]+\.md)`", bullet_block)
+    bullet_block = content.split(marker, 1)[1].lstrip().split("\n\n", 1)[0]
+    files = re.findall(r"`(?:\.agents/skills/)?(?:shared-references/)?([^`/]+\.md)`", bullet_block)
     return files or None
 
 
@@ -81,23 +81,33 @@ def _extract_index_persistent_baseline(content: str) -> list[str] | None:
     line = next((item for item in content.splitlines() if "任何数学建模Skill均完整读取：" in item), None)
     if line is None:
         return None
-    files = re.findall(r"`([^`]+\.md)`", line)
+    baseline_clause = line.split("。", 1)[0]
+    files = re.findall(r"`([^`]+\.md)`", baseline_clause)
     return files or None
 
 
 def _validate_persistent_baseline(root: Path, failures: list[str]) -> int:
-    agents_path = root / "AGENTS.md"
     index_path = root / "shared-references" / "rule_authority_index.md"
-    agents_files = _extract_agents_persistent_baseline(agents_path.read_text(encoding="utf-8")) if agents_path.exists() else None
-    index_files = _extract_index_persistent_baseline(index_path.read_text(encoding="utf-8")) if index_path.exists() else None
-    if agents_files != PERSISTENT_BASELINE:
-        failures.append(f"AGENTS.md: persistent baseline must be {PERSISTENT_BASELINE}; found {agents_files}")
-    if index_files != PERSISTENT_BASELINE:
-        failures.append(f"shared-references/rule_authority_index.md: persistent baseline must be {PERSISTENT_BASELINE}; found {index_files}")
-    if agents_files != index_files:
-        failures.append(f"persistent baseline mismatch: AGENTS.md={agents_files}; rule_authority_index.md={index_files}")
-    return 3
+    agent_paths = [root / "AGENTS.md"]
+    workspace_agents = root.parent.parent / "AGENTS.md"
+    if workspace_agents.exists() and workspace_agents not in agent_paths:
+        agent_paths.insert(0, workspace_agents)
 
+    index_files = _extract_index_persistent_baseline(index_path.read_text(encoding="utf-8")) if index_path.exists() else None
+    if index_files != PERSISTENT_BASELINE:
+        failures.append(
+            "shared-references/rule_authority_index.md: persistent baseline must be "
+            f"{PERSISTENT_BASELINE}; found {index_files}"
+        )
+
+    for agents_path in agent_paths:
+        agents_files = _extract_agents_persistent_baseline(agents_path.read_text(encoding="utf-8")) if agents_path.exists() else None
+        label = agents_path.as_posix()
+        if agents_files != PERSISTENT_BASELINE:
+            failures.append(f"{label}: persistent baseline must be {PERSISTENT_BASELINE}; found {agents_files}")
+        if agents_files != index_files:
+            failures.append(f"persistent baseline mismatch: {label}={agents_files}; rule_authority_index.md={index_files}")
+    return 1 + 2 * len(agent_paths)
 def validate(root: Path) -> dict:
     failures: list[str] = []
     checks = 0

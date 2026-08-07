@@ -152,7 +152,7 @@ ax.set_frame_on(False)
 
 fig.subplots_adjust(left=0.10, right=0.90, top=0.86, bottom=0.06)
 fig.savefig(
-    '_reproduction_path("radar_dora_repro.png")',
+    _reproduction_path("radar_dora_repro.png"),
     dpi=300, facecolor='white',
 )
 plt.close(fig)

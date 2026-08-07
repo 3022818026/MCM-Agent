@@ -134,7 +134,7 @@ leg = ax.legend(
 
 fig.tight_layout(pad=0.9)
 fig.savefig(
-    '_reproduction_path("scatter_tsne_repro.png")',
+    _reproduction_path("scatter_tsne_repro.png"),
     dpi=300, facecolor='white',
 )
 plt.close(fig)

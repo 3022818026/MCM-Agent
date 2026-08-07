@@ -170,7 +170,7 @@ leg = ax1.legend(
 )
 
 fig.savefig(
-    '_reproduction_path("scatter_break_repro.png")',
+    _reproduction_path("scatter_break_repro.png"),
     dpi=300, facecolor='white',
 )
 plt.close(fig)

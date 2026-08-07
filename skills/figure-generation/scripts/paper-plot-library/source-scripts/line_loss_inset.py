@@ -158,7 +158,7 @@ fig.add_artist(con1)
 fig.add_artist(con2)
 
 fig.savefig(
-    '_reproduction_path("line_loss_inset_repro.png")',
+    _reproduction_path("line_loss_inset_repro.png"),
     dpi=300, facecolor='white',
 )
 plt.close(fig)

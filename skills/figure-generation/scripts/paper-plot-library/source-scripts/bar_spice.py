@@ -167,7 +167,7 @@ draw_panel(
     legend_anchor=(0.992, 0.986),
 )
 
-plt.savefig('_reproduction_path("bar_spice_repro.png")',
+plt.savefig(_reproduction_path("bar_spice_repro.png"),
             dpi=300, facecolor='white')
 plt.close()
 print('saved: bar_spice_repro.png')

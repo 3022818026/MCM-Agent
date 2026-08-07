@@ -100,7 +100,7 @@ ax2.tick_params(direction='in', length=5, width=1.2, labelsize=11)
 ax2.grid(False)
 
 fig2.tight_layout(pad=0.9)
-fig2.savefig('_reproduction_path("line_selfdistill_train_repro.png")',
+fig2.savefig(_reproduction_path("line_selfdistill_train_repro.png"),
              dpi=300, facecolor='white')
 plt.close(fig2)
 print('saved: line_selfdistill_v6_repro.png')
@@ -170,7 +170,7 @@ ax3.tick_params(direction='in', length=5, width=1.2, labelsize=11)
 ax3.grid(False)
 
 fig3.tight_layout(pad=0.9)
-fig3.savefig('_reproduction_path("line_selfdistill_scale_repro.png")',
+fig3.savefig(_reproduction_path("line_selfdistill_scale_repro.png"),
              dpi=300, facecolor='white')
 plt.close(fig3)
 print('saved: line_selfdistill_scaling_repro.png')
