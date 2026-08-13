@@ -20,12 +20,16 @@
 3. 标题“Word公式框输入代码”；
 4. 一个只含一整行LaTeX输入的代码块。
 
+每个独立居中公式还必须具有公式号。公式号按论文最终出现顺序连续编排，默认使用“（1）”“（2）”……的全篇连续编号；同一组确需分列的子公式可使用“（1a）”“（1b）”。行内简单符号不编号。正文引用统一写为“由式（1）”“见式（2）”，不得使用“上式”“下式”或手工重复编号。若当届官方模板另有编号格式，以官方模板为准。
+
+聊天交付时，显式公式的右侧同步显示对应公式号；Word公式框输入代码只保留公式数学主体，不把编号、`\tag`或中文说明写入公式代码。生成Word成稿时，使用Word可稳定对齐并可连续维护的公式编号方式，将编号置于公式同行右侧；不得以空格手工推齐。
+
 示例：
 
 设作物i的价格下限和价格上限分别为Pᵢᴸ和Pᵢᵁ，则基准销售价格取价格区间的中点：
 
 \[
-P_i=\frac{P_i^L+P_i^U}{2}.
+P_i=\frac{P_i^L+P_i^U}{2}.\tag{1}
 \]
 
 Word公式框输入代码：
@@ -51,7 +55,7 @@ P_i=\frac{P_i^L+P_i^U}{2}
 显式公式：
 
 \[
-z_t^\omega=\left(z_t^{D,\omega},z_t^{P,\omega},z_t^{C,\omega}\right),\qquad z_t^\omega\sim N\left(0,R\right).
+z_t^\omega=\left(z_t^{D,\omega},z_t^{P,\omega},z_t^{C,\omega}\right),\qquad z_t^\omega\sim N\left(0,R\right).\tag{2}
 \]
 
 Word公式框输入代码：
@@ -63,7 +67,7 @@ z_t^\omega=\left(z_t^{D,\omega},z_t^{P,\omega},z_t^{C,\omega}\right),\qquad z_t^
 显式公式：
 
 \[
-Q_{ti}=\sum_{l\in L}\sum_{s\in S}Y_{lsi}x_{tlsi}.
+Q_{ti}=\sum_{l\in L}\sum_{s\in S}Y_{lsi}x_{tlsi}.\tag{3}
 \]
 
 Word公式框输入代码：
@@ -75,7 +79,7 @@ Q_{ti}=\sum_{l\in L}\sum_{s\in S}Y_{lsi}x_{tlsi}
 显式公式：
 
 \[
-U_{ti}=\min\left\{Q_{ti},D_{ti}\right\}.
+U_{ti}=\min\left\{Q_{ti},D_{ti}\right\}.\tag{4}
 \]
 
 Word公式框输入代码：
@@ -87,7 +91,7 @@ U_{ti}=\min\left\{Q_{ti},D_{ti}\right\}
 显式公式：
 
 \[
-\omega^*=\underset{\omega\notin S}{\arg\max}\ \underset{\nu\in S}{\min}\left\|\mathbf{z}^{\omega}-\mathbf{z}^{\nu}\right\|_2.
+\omega^*=\underset{\omega\notin S}{\arg\max}\ \underset{\nu\in S}{\min}\left\|\mathbf{z}^{\omega}-\mathbf{z}^{\nu}\right\|_2.\tag{5}
 \]
 
 Word公式框输入代码：
@@ -111,7 +115,7 @@ Word对复杂 `cases` 环境及公式内长段中文的兼容性不稳定。优�
 > 当组合(l,s,i)满足适种条件时，aₗₛᵢ取1；否则取0。该变量可以表示为：
 
 \[
-a_{lsi}=\mathbb{I}\left\{(l,s,i)\in\mathcal{F}\right\}.
+a_{lsi}=\mathbb{I}\left\{(l,s,i)\in\mathcal{F}\right\}.\tag{6}
 \]
 
 Word公式框输入代码：
@@ -145,7 +149,7 @@ a_{lsi}=\mathbb{I}\left\{(l,s,i)\in\mathcal{F}\right\}
 
 ## 八、交付前检查
 
-逐式确认：显式公式与单行代码数学含义完全一致；代码只有一行；括号、上下标、集合、范数和运算符完整；正文已解释公式用途和关键符号；Word实测没有命令原样显示、乱码、缺括号或异常换行。
+逐式确认：显式公式与单行代码数学含义完全一致；代码只有一行；括号、上下标、集合、范数和运算符完整；正文已解释公式用途和关键符号；每个独立公式均有唯一、连续的公式号且正文引用对应；Word实测没有命令原样显示、乱码、缺括号、异常换行或编号错位。
 
 禁止只给代码而不给显式公式，禁止在普通正文中堆放LaTeX源码，禁止把代码拆成多行，禁止在代码外保留公式定界符，禁止使用未经确认的命令，禁止把真实表格改为文字，禁止交付不能直接粘贴进Word公式框的复杂环境。
 

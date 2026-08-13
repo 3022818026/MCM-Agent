@@ -19,7 +19,7 @@ description: 根据当前题目的真实数据、已登记结果和论文论证�
 
 ## 开始前读取内容
 
-读取题面、结果注册表、评价报告、正文论证目标和现有绘图代码。先按`../shared-references/rule_authority_index.md`读取常驻基线，本Skill专项必读`common_figure_requirements.md`；仅在题注/正文位置、结果传播或复杂比较统计被触发时，再读取`common_writing_requirements.md`、`common_code_requirements.md`和`evaluator_review_principles.md`。
+读取题面、结果注册表、评价报告、正文论证目标和现有绘图代码。先按`../shared-references/rule_authority_index.md`读取常驻基线；本Skill专项必读`common_figure_requirements.md`和`references/chart_selection_and_flowchart_style.md`。需要调用内置模板时读取`references/paper-plot-library/style_catalog.md`；仅在题注/正文位置、结果传播或复杂比较统计被触发时，再读取`common_writing_requirements.md`、`common_code_requirements.md`和`evaluator_review_principles.md`。
 
 ## 历史记忆使用规则
 
@@ -32,8 +32,8 @@ description: 根据当前题目的真实数据、已登记结果和论文论证�
 ## 执行步骤
 
 1. 为每幅图定义一句论证结论；无明确任务则不画。
-2. 选择与数据结构匹配的图形，确定主次信息和是否拆图。
-3. 默认使用Python绘图脚本读取MATLAB或其他分析程序导出的已核验数据，优先调用scripts/paper-plot-library/paper_plot_library.py中的风格模板；按论文制图规范设置字体、线宽、标记、配色和导出参数。只有模板与数据结构不匹配时，才在同一风格规范下自定义Python图形。
+2. 按`references/chart_selection_and_flowchart_style.md`根据数据结构、论证任务和最终版面选择图形、初始比例、图例位置及是否拆图；推荐比例不是固定模板。
+3. 先核对数据清单、数据/结果版本、哈希、样本数和允许用途：描述性图读取锁定清洁基础数据，模型与结果图读取锁定运行导出的图表源数据；禁止回读原始附件或在绘图脚本中再次清洗。随后优先调用scripts/paper-plot-library/paper_plot_library.py中的适配模板，并按论文制图规范设置字体、线宽、标记、配色和导出参数。
 4. 补齐编号、图题、坐标、单位、图例、区间、阶段或事件标注。
 5. 控制子图数量；标签密集时分页、局部放大或抽样显示但不改变统计事实。
 6. 导出高分辨率和可编辑格式，检查论文实际缩放与黑白打印。
@@ -65,14 +65,10 @@ description: 根据当前题目的真实数据、已登记结果和论文论证�
 - MATLAB承担数据分析、建模、求解和已核验结果导出；Python承担最终PNG绘图。绘图脚本只读取锁定结果或图表源数据，不写入或修改核心数值。
 - 模板不能取代图形选择。比较不清楚时仍须执行比较图强制闭环，改用差值分布、配对散点、区间图或其他适配形式。
 
-## 论证任务—模板选择
+## 图形与模板选择
 
-读取references/paper-plot-library/style_catalog.md后，按“结构、趋势与区间、分布与尾部风险、配对差异、关系与诊断、敏感性与权衡、空间、流程”选择参数化模板。优先复用paper_plot_library.py中已有函数；模板不匹配时保持同一视觉语法自定义，不能因已有模板而改变数据口径或论证任务。
+先按`references/chart_selection_and_flowchart_style.md`确定图形语义、初始比例和流程图风格，再按`references/paper-plot-library/style_catalog.md`选择参数化模板。模板只复用视觉语法和可复现代码，不改变数据口径或论证任务。配对差异、近重合曲线、尾部风险和不确定性按`common_figure_requirements.md`的比较图闭环处理；已有模板不适配时自定义同风格图形。
 
-- 组成结构优先stacked_composition_bar；年度情景风险优先annual_risk_trend；方案分布优先risk_boxplot或ecdf_risk_comparison。
-- 近重合的配对结果必须调用paired_difference_distribution或等价差分图；不以两条不同色曲线交付含糊比较。
-- 相关与正负关系分别调用correlation_heatmap和diverging_bar；预测与机理复构分别调用observed_predicted_scatter和residual_scatter。
-- 只在前提成立时使用sensitivity_tornado、sensitivity_curve、pareto_front、spatial_bubble或process_flowchart，并把其条件、方向或参数范围写入图注和正文。
 ## 输出路径
 
 默认写入 `outputs/figures/` 与 `outputs/results/figure_manifest.md`。
@@ -115,7 +111,7 @@ description: 根据当前题目的真实数据、已登记结果和论文论证�
 
 ## 流程图选择门禁
 
-- 按 `../shared-references/common_figure_requirements.md` 判断是否需要总体流程图或单问题流程图；简单问题不机械制图。
+- 按 `../shared-references/common_figure_requirements.md` 判断是否需要总体流程图或单问题流程图；简单问题不机械制图。需要流程图时，完整执行`references/chart_selection_and_flowchart_style.md`中的黑白细框、正交箭头、几何对齐和蛇形布局规则。
 - 总体流程图只表达跨问题关系，单问流程图只表达复杂内部步骤，两者不得重复。
 - 流程图也必须执行论文实际尺寸自审；节点超过10个、文字过长、黑白不可辨或正文已完整重复时，先删减或取消该图。
 

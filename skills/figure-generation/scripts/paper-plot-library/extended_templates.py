@@ -12,7 +12,13 @@ from typing import Mapping, Sequence
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import TwoSlopeNorm
-from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
+from matplotlib import font_manager
+from matplotlib.patches import FancyArrowPatch, Rectangle
+
+try:
+    from .flowchart_geometry import display_label, node_dimensions, prepare_layout
+except ImportError:  # 支持将本目录直接加入sys.path后导入。
+    from flowchart_geometry import display_label, node_dimensions, prepare_layout
 
 try:
     from .paper_plot_library import PALETTE, _finish_axes, apply_paper_style
@@ -926,6 +932,27 @@ def spatial_bubble(
     return fig, ax
 
 
+
+def _flowchart_font_family() -> str:
+    """Choose an installed serif font suitable for formal paper flowcharts."""
+
+    installed = {entry.name.casefold(): entry.name for entry in font_manager.fontManager.ttflist}
+    for candidate in (
+        "SimSun",
+        "STSong",
+        "Songti SC",
+        "Noto Serif CJK SC",
+        "Source Han Serif SC",
+        "Times New Roman",
+        "DejaVu Serif",
+    ):
+        match = installed.get(candidate.casefold())
+        if match:
+            return match
+    return "serif"
+
+
+
 def process_flowchart(
     nodes: Sequence[str],
     edges: Sequence[tuple[str, str]],
@@ -935,71 +962,84 @@ def process_flowchart(
     figsize: tuple[float, float] | None = None,
     font_size: float = 13,
 ) -> tuple[plt.Figure, plt.Axes]:
-    """绘制5—10个节点的建模流程图或复杂算法结构图。
+    """Draw a formal black-and-white mathematical-modeling flowchart.
 
-    流程图只表达步骤关系，不重复正文细节。用户应传入有意义的短节点文字；
-    节点超过10个、每个节点文字过长或关系过密时应拆图或删减。
+    With ``positions=None``, nodes must form one consecutive chain in the order
+    supplied and are placed in a three-column serpentine layout. Branches,
+    cycles, and parallel paths require explicit positions. Explicit positions
+    must align every edge horizontally or vertically; arrows that cross, overlap,
+    or pass through another node are rejected.
+
+    ``node_groups`` is retained for API compatibility and validation only. It no
+    longer changes node colors because the paper style requires identical white
+    rectangles with thin black borders.
     """
 
     apply_paper_style(font_size)
     labels = list(nodes)
-    if not 2 <= len(labels) <= 10 or len(set(labels)) != len(labels):
-        raise ValueError("流程图节点数应为2—10且节点名称唯一。")
-    if any(len(label) > 20 for label in labels):
-        raise ValueError("流程图节点文字过长；请将解释移到正文。")
-    if positions is None:
-        columns = min(5, len(labels))
-        rows = ceil(len(labels) / columns)
-        position_map = {}
-        for idx, label in enumerate(labels):
-            row, column = divmod(idx, columns)
-            position_map[label] = ((column + 0.5) / columns, 1 - (row + 0.5) / rows)
-    else:
-        if set(positions) != set(labels):
-            raise ValueError("positions必须恰好包含每个节点。")
-        position_map = dict(positions)
-    group_palette = [PALETTE["navy"], PALETTE["teal"], PALETTE["orange"], PALETTE["purple"], PALETTE["green"]]
-    group_names = list(dict.fromkeys((node_groups or {}).get(label, "默认") for label in labels))
-    group_color = {group: group_palette[idx % len(group_palette)] for idx, group in enumerate(group_names)}
-    figsize = figsize or (9.0, 3.4 if len(labels) <= 5 else 5.0)
+    if not 2 <= len(labels) <= 12 or len(set(labels)) != len(labels):
+        raise ValueError("流程图节点数应为2—12且节点名称唯一。")
+    if any(not isinstance(label, str) or not label.strip() for label in labels):
+        raise ValueError("流程图节点名称必须是非空字符串。")
+    display_labels = {label: display_label(label.strip()) for label in labels}
+    if node_groups is not None and not set(node_groups).issubset(display_labels):
+        raise ValueError("node_groups只能包含nodes中的节点。")
+
+    width, height = node_dimensions(display_labels)
+    position_map, row_count, segments = prepare_layout(labels, edges, positions, width, height)
+    if figsize is None:
+        default_height = {1: 2.8, 2: 4.0, 3: 4.8, 4: 5.0}.get(row_count, 5.0)
+        figsize = (10.0 if len(labels) > 3 else 9.0, default_height)
 
     fig, ax = plt.subplots(figsize=figsize)
+    fig.patch.set_facecolor("white")
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
     ax.axis("off")
-    width, height = 0.16, 0.12
-    for source, target in edges:
-        if source not in position_map or target not in position_map:
-            raise ValueError("每条边的端点都必须属于nodes。")
-        start, end = position_map[source], position_map[target]
-        arrow = FancyArrowPatch(
-            start,
-            end,
-            arrowstyle="-|>",
-            mutation_scale=12,
-            linewidth=1.1,
-            color=PALETTE["ink"],
-            shrinkA=18,
-            shrinkB=18,
-            connectionstyle="arc3,rad=0.0",
-            zorder=1,
+
+    for start, end, _ in segments:
+        ax.add_patch(
+            FancyArrowPatch(
+                start,
+                end,
+                arrowstyle="-|>",
+                mutation_scale=11,
+                linewidth=1.0,
+                color="#000000",
+                shrinkA=0,
+                shrinkB=0,
+                connectionstyle="arc3,rad=0.0",
+                zorder=1,
+            )
         )
-        ax.add_patch(arrow)
+
+    font_family = _flowchart_font_family()
     for label in labels:
         x_value, y_value = position_map[label]
-        group = (node_groups or {}).get(label, "默认")
-        edge_color = group_color[group]
-        box = FancyBboxPatch(
-            (x_value - width / 2, y_value - height / 2),
-            width,
-            height,
-            boxstyle="round,pad=0.012,rounding_size=0.015",
-            facecolor="white",
-            edgecolor=edge_color,
-            linewidth=1.35,
-            zorder=2,
+        ax.add_patch(
+            Rectangle(
+                (x_value - width / 2, y_value - height / 2),
+                width,
+                height,
+                facecolor="white",
+                edgecolor="#000000",
+                linewidth=1.0,
+                zorder=2,
+            )
         )
-        ax.add_patch(box)
-        ax.text(x_value, y_value, label, ha="center", va="center", fontsize=max(10, font_size - 2), color=PALETTE["ink"], zorder=3, wrap=True)
-    fig.tight_layout(pad=0.4)
+        ax.text(
+            x_value,
+            y_value,
+            display_labels[label],
+            ha="center",
+            va="center",
+            fontsize=font_size,
+            fontfamily=font_family,
+            fontweight="normal",
+            color="#000000",
+            linespacing=1.15,
+            zorder=3,
+        )
+
+    fig.tight_layout(pad=0.3)
     return fig, ax

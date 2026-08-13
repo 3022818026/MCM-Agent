@@ -32,6 +32,7 @@ PAPER_WRITING_REQUIRED_REFS = [
     "academic_style_revision.md",
     "evidence_claim_discipline.md",
     "word_formula_output_protocol.md",
+    "paper_model_comparison_writing.md",
 ]
 PAPER_REVIEW_REQUIRED_REFS = [
     "paper_integrity_gate.md",
@@ -39,6 +40,7 @@ PAPER_REVIEW_REQUIRED_REFS = [
     "academic_style_revision.md",
     "evidence_claim_discipline.md",
     "supervisor_review_lens.md",
+    "paper_model_comparison_writing.md",
 ]
 ACADEMIC_STYLE_AUTHORITY_PHRASE = "论文正文语言与语义规范的最高权威"
 
@@ -70,19 +72,29 @@ FORBIDDEN_DEFAULTS = [
 REQUIRED_GUARDRAILS = {
     \
     "shared-references/competition_workflow.md": ["短指令意图补全与应急模式", "覆盖范围", "质量标准"],
-    "shared-references/common_modeling_principles.md": ["题面结构解析与混合题型", "自动拆题结果都只是候选解析", "关键措辞台账", "题面措辞→数学对象"],
-    "shared-references/common_code_requirements.md": ["模型—代码反向核对", "原始字段到代码变量", "跨平台调用方式", "MATLAB分析与Python绘图协议", "main.m", "rng", "paper_plot_library.py"],
-    "shared-references/evaluator_review_principles.md": ["正确性证据阶梯", "独立交叉核验", "压力/边界/失效测试", "自动检查的证据边界", "自动检查通过只能表示", "独立复算代表性数值"],
-    "shared-references/evidence_claim_discipline.md": ["证据分级与可支持范围", "模型记忆", "主张链", "引用与检索的能力降级", "AI 协作与人工确认边界"],
+    "shared-references/common_modeling_principles.md": ["题目结果总目标门禁", "题目原句—必须回答的判断/数值/方案", "关键数值可复算", "题面结构解析与混合题型", "自动拆题结果都只是候选解析", "关键措辞台账", "题面措辞→数学对象", "统一基础评价器", "跨阶段模型接口", "继承项—新增项—替换项—失效项"],
+    "data-preparation/SKILL.md": ["数据处理决策台账", "清洁基础数据", "模型就绪", "数据清单", "下游数据消费契约", "箱线图", "不得对全量数据先拟合处理器再划分"],
+    "shared-references/common_code_requirements.md": ["锁定数据版本与单一来源", "数据清单", "不得再次临时删除", "模型—代码反向核对", "原始字段到代码变量", "跨平台调用方式", "统一评价器与模型接口实现", "重复计量测试", "机器可读接口表", "MATLAB分析与Python绘图协议", "main.m", "rng", "paper_plot_library.py"],
+    "modeling-scientist/SKILL.md": ["经确认的内部机器学习核验", "取得明确确认后再训练", "不因“不写论文”而降低复现与证据标准"],
+    "modeling-design/SKILL.md": ["内部核验卡", "未确认前只保留为候选计划"],
+    "shared-references/evaluator_review_principles.md": ["正确性证据阶梯", "独立交叉核验", "压力/边界/失效测试", "验证职责分离与模型晋级", "同一证据族", "反演/参数估计", "统计到决策链", "自动检查的证据边界", "自动检查通过只能表示", "独立复算代表性数值"],
+    "shared-references/evidence_claim_discipline.md": ["证据分级与可支持范围", "模型记忆", "主张链", "引用与检索的能力降级", "国家或行业标准", "DOI或官方链接", "来源之间冲突", "外部资料是辅助验证证据", "AI 协作与人工确认边界"],
     "shared-references/quality_gate_protocol.md": ["问题分级", "需要用户确认", "早停与回退", "反向审视与独立性", "交付问题台账", "全程生成—审查—修复闭环", "生成前门禁", "生成后审查", "未通过时的修复闭环", "责任路由"],
-    "shared-references/paper_integrity_gate.md": ["关键措辞台账", "论文有而代码无"],
+    "shared-references/paper_integrity_gate.md": ["关键措辞台账", "论文有而代码无", "问题背景", "每个独立公式是否有唯一公式号", "保真润色", "反向核对"],
     "shared-references/model_comparison_decision_rules.md": ["候选方法卡", "不适用条件", "常见失败信号"],
     "shared-references/artifact_build_release_protocol.md": ["能力—替代矩阵", "不得硬依赖单一生态", "文档—实现脱节"],
-    "shared-references/common_figure_requirements.md": ["Python论文制图与去模板化风格", "12—18 pt之间调整", "深色、高饱和度、高对比度", "三维饼图和三维柱状图可以采用", "常见AI模板痕迹"],
-    "paper-writing/references/competition_prose_style.md": ["逻辑先行，叙述自然", "准确、克制、有边界", "分节叙述契约", "去模板化与润色检查", "交付前自检"],
-    "shared-references/user_delivery_contract.md": ["默认使用MATLAB", "MATLAB R2023b", "未经用户明确同意", "12—18 pt之间调整", "三维饼图和三维柱状图不是禁用项"],
-    "shared-references/supervisor_review_lens.md": ["定位与权威边界", "四个必检维度", "不可直接迁移的外部约束", "不为任何结论提供证据"],
-    "shared-references/rule_authority_index.md": ["常驻基线", "规则权威来源", "按需加载矩阵", "不得无任务地批量加载全部历史文件"],
+    "shared-references/common_figure_requirements.md": ["数据质量诊断图", "锁定的清洁基础数据", "Python论文制图与去模板化风格", "12—18 pt之间调整", "克制的深色高对比度", "3D图只在数据确含第三维", "数据最稀疏", "常见AI模板痕迹"],
+    "figure-generation/references/chart_selection_and_flowchart_style.md": ["常用图形与初始比例", "图例放在", "流程图强制风格", "3列蛇形布局"],
+    "paper-writing/references/competition_prose_style.md": ["逻辑先行，叙述自然", "准确、克制、有边界", "分节叙述契约", "写前段落契约与证据骨架", "主张—证据—解释—边界/承接", "去模板化与润色检查", "交付前自检"],
+    "paper-writing/references/word_formula_output_protocol.md": ["每个独立居中公式还必须具有公式号", "正文引用统一写为", "不得以空格手工推齐", "编号错位"],
+    "shared-references/user_delivery_contract.md": ["严谨、准确地解决题目", "锁定数据版本", "下游临时清洗", "机器学习仅用于内部核对", "不得隐瞒会推翻或削弱", "允许检索真实可信的文献", "外部资料不得替代题面", "默认使用MATLAB", "MATLAB R2023b", "未经用户明确同意", "12—18 pt之间调整", "候选模型比较与正文边界", "纯装饰3D不使用", "问题一分析", "每个独立居中公式必须带公式号", "不得直接交付未经润色的初稿"],
+    "shared-references/common_writing_requirements.md": ["候选模型比较与正文边界", "不自动进入论文正文", "最终采用的模型"],
+    "shared-references/paper_model_comparison_writing.md": ["内部比较", "机器学习可以只作为内部核验模型", "不得隐去会推翻、显著削弱或改变", "正文默认写法", "例外披露", "措辞边界"],
+    "shared-references/supervisor_review_lens.md": ["定位与权威边界", "终审前置：提交画像与覆盖声明", "主张—模块—证据反向映射", "分节角色复核", "发现质量、严重度与提交结论", "条件触发的外部检索与语言检查", "不可直接迁移的外部约束", "固定三至五天审稿时点", "不为任何结论提供证据"],
+    "paper-review/SKILL.md": ["提交画像与覆盖矩阵", "精确证据位置", "全文机械扫描不得以抽样代替", "最优先三项修复", "最终提交结论必须与未关闭问题一致"],
+    "shared-references/academic_style_revision.md": ["语义风险分级", "强制后置润色闭环", "反向逐项核对", "只交付通过润色门禁"],
+    "paper-writing/SKILL.md": ["生成后强制润色", "不得直接交付初稿", "反向逐项核对"],
+    "shared-references/rule_authority_index.md": ["常驻基线", "规则权威来源", "按需加载矩阵", "不得无任务地批量加载全部历史文件", "初稿不得绕过后置润色直接交付"],
 }
 
 
