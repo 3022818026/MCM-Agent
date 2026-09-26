@@ -19,7 +19,7 @@ description: 按已批准的数学建模方案编写和运行可复现代码，�
 
 ## 开始前读取内容
 
-先按`../shared-references/rule_authority_index.md`读取常驻基线。本Skill专项必读`common_code_requirements.md`和`paper_integrity_gate.md`；仅在模型语义、异常失败或阶段回退需要时再读取`common_modeling_principles.md`、`common_mistakes.md`和`competition_workflow.md`。
+先按`../shared-references/rule_authority_index.md`读取常驻基线，并完整执行`../shared-references/paper_writing_revision_contract.md`中`model-implementation`的公式、求解与结果释义证据交接。本Skill专项必读`common_code_requirements.md`和`paper_integrity_gate.md`；仅在模型语义、异常失败或阶段回退需要时再读取`common_modeling_principles.md`、`common_mistakes.md`和`competition_workflow.md`。
 
 ## 输入
 
@@ -57,10 +57,6 @@ description: 按已批准的数学建模方案编写和运行可复现代码，�
 
 干净环境可运行；随机设置可追踪；结果来自唯一最终入口；约束、单位、路径匿名、配置—结果和代码—模型映射均通过；失败和待复核状态没有被隐藏。
 
-## 用户协作与项目学习
-
-常驻基线中的`user_delivery_contract.md`优先。用户纠正、运行失败或审计异常后，先修正并复核当前交付；仅把经过复核的通用实现经验记录到`project_learning_loop.md`。
-
 ## 禁止事项
 
 禁止先写结果后补代码、手工改核心输出、为美观改数据、用测试集调参、复制历史结果、未经允许大改既有正确逻辑，或以绘图脚本冒充最终求解入口。
@@ -82,4 +78,4 @@ description: 按已批准的数学建模方案编写和运行可复现代码，�
 
 ## 全程质量闭环
 
-除按规则索引读取常驻基线外，执行前、每次生成或修改后及交付前必须完整遵循`../shared-references/quality_gate_protocol.md`中的“全程生成—审查—修复闭环”。先从本Skill和当前任务提取适用验收项并保留证据；生成后立即执行相应自动检查与人工核对。任何阻断项或高风险项未通过时，定位根因、使受影响下游产物转为待复核，并在既有授权范围内修复、重算、重绘、重写或回退后重新检查。只有全部适用验收项具有通过证据时才可标记完成；需要用户决策、原始附件或外部授权时如实标记阻断，不虚构通过。
+执行`../shared-references/quality_gate_protocol.md`中的“Skill执行握手”和“全程生成—审查—修复闭环”；任何活动规则未满足时，不得交付或宣称完成。

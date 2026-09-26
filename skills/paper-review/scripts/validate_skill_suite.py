@@ -25,8 +25,10 @@ PERSISTENT_BASELINE = [
     "rule_authority_index.md",
     "quality_gate_protocol.md",
     "user_delivery_contract.md",
+    "paper_writing_revision_contract.md",
 ]
 PAPER_WRITING_REQUIRED_REFS = [
+    "paper_writing_revision_contract.md",
     "common_writing_requirements.md",
     "paper_integrity_gate.md",
     "academic_style_revision.md",
@@ -35,6 +37,7 @@ PAPER_WRITING_REQUIRED_REFS = [
     "paper_model_comparison_writing.md",
 ]
 PAPER_REVIEW_REQUIRED_REFS = [
+    "paper_writing_revision_contract.md",
     "paper_integrity_gate.md",
     "evaluator_review_principles.md",
     "academic_style_revision.md",
@@ -79,22 +82,47 @@ REQUIRED_GUARDRAILS = {
     "modeling-design/SKILL.md": ["内部核验卡", "未确认前只保留为候选计划"],
     "shared-references/evaluator_review_principles.md": ["正确性证据阶梯", "独立交叉核验", "压力/边界/失效测试", "验证职责分离与模型晋级", "同一证据族", "反演/参数估计", "统计到决策链", "自动检查的证据边界", "自动检查通过只能表示", "独立复算代表性数值"],
     "shared-references/evidence_claim_discipline.md": ["证据分级与可支持范围", "模型记忆", "主张链", "引用与检索的能力降级", "国家或行业标准", "DOI或官方链接", "来源之间冲突", "外部资料是辅助验证证据", "AI 协作与人工确认边界"],
-    "shared-references/quality_gate_protocol.md": ["问题分级", "需要用户确认", "早停与回退", "反向审视与独立性", "交付问题台账", "全程生成—审查—修复闭环", "生成前门禁", "生成后审查", "未通过时的修复闭环", "责任路由"],
-    "shared-references/paper_integrity_gate.md": ["关键措辞台账", "论文有而代码无", "问题背景", "每个独立公式是否有唯一公式号", "保真润色", "反向核对"],
+    "shared-references/quality_gate_protocol.md": ["Skill执行握手", "活动规则卡", "问题分级", "需要用户确认", "早停与回退", "反向审视与独立性", "交付问题台账", "全程生成—审查—修复闭环", "生成前门禁", "生成后审查", "未通过时的修复闭环", "责任路由"],
+    "shared-references/paper_integrity_gate.md": ["关键措辞台账", "论文有而代码无", "问题背景", "每个独立公式是否有唯一公式号", "保真润色", "反向核对", "摘要是否通过独立可读性检查", "占位符语义", "不允许读者猜测“—”"],
     "shared-references/model_comparison_decision_rules.md": ["候选方法卡", "不适用条件", "常见失败信号"],
     "shared-references/artifact_build_release_protocol.md": ["能力—替代矩阵", "不得硬依赖单一生态", "文档—实现脱节"],
     "shared-references/common_figure_requirements.md": ["数据质量诊断图", "锁定的清洁基础数据", "Python论文制图与去模板化风格", "12—18 pt之间调整", "克制的深色高对比度", "3D图只在数据确含第三维", "数据最稀疏", "常见AI模板痕迹"],
     "figure-generation/references/chart_selection_and_flowchart_style.md": ["常用图形与初始比例", "图例放在", "流程图强制风格", "3列蛇形布局"],
     "paper-writing/references/competition_prose_style.md": ["逻辑先行，叙述自然", "准确、克制、有边界", "分节叙述契约", "写前段落契约与证据骨架", "主张—证据—解释—边界/承接", "去模板化与润色检查", "交付前自检"],
     "paper-writing/references/word_formula_output_protocol.md": ["每个独立居中公式还必须具有公式号", "正文引用统一写为", "不得以空格手工推齐", "编号错位"],
-    "shared-references/user_delivery_contract.md": ["严谨、准确地解决题目", "锁定数据版本", "下游临时清洗", "机器学习仅用于内部核对", "不得隐瞒会推翻或削弱", "允许检索真实可信的文献", "外部资料不得替代题面", "默认使用MATLAB", "MATLAB R2023b", "未经用户明确同意", "12—18 pt之间调整", "候选模型比较与正文边界", "纯装饰3D不使用", "问题一分析", "每个独立居中公式必须带公式号", "不得直接交付未经润色的初稿"],
-    "shared-references/common_writing_requirements.md": ["候选模型比较与正文边界", "不自动进入论文正文", "最终采用的模型"],
+    "shared-references/paper_writing_revision_contract.md": [
+        "常驻高优先级用户合同",
+        "每次调用的跨阶段强制动作",
+        "背景+问题+解决方法+意义+针对每个问题的重要结论",
+        "约100字",
+        "每个实际问题单独一段",
+        "数据来源或选取范围",
+        "不得纯罗列全部指标",
+        "长短句结合",
+        "实际不便",
+        "现实意义",
+        "每个问题的具体要求与措施单独一段",
+        "因素考虑和数据处理",
+        "真实案例或文献",
+        "AI式假设清单",
+        "标题优先展示",
+        "不了解该模型的读者",
+        "公式说明来历和作用",
+        "优先采用可复现的数值积分",
+        "评价使用准确、易懂",
+        "不在模型评价中重复结果部分",
+        "附件写作合同审查",
+        "不能用抽样段落代替全文检查",
+    ],
+    "shared-references/user_delivery_contract.md": ["严谨、准确地解决题目", "锁定数据版本", "下游临时清洗", "机器学习仅用于内部核对", "不得隐瞒会推翻或削弱", "允许检索真实可信的文献", "外部资料不得替代题面", "默认使用MATLAB", "MATLAB R2023b", "未经用户明确同意", "12—18 pt之间调整", "候选模型比较与正文边界", "纯装饰3D不使用", "问题一分析", "每个独立居中公式必须带公式号", "不得直接交付未经润色的初稿", "仅看摘要即可明白全文", "Markdown加粗", "表中结果不得莫名其妙写成“—”"],
+    "shared-references/common_writing_requirements.md": ["候选模型比较与正文边界", "不自动进入论文正文", "最终采用的模型", "仅看摘要就应能明白", "结果解释闭环", "同一张表不得让“—”兼指多个原因"],
     "shared-references/paper_model_comparison_writing.md": ["内部比较", "机器学习可以只作为内部核验模型", "不得隐去会推翻、显著削弱或改变", "正文默认写法", "例外披露", "措辞边界"],
     "shared-references/supervisor_review_lens.md": ["定位与权威边界", "终审前置：提交画像与覆盖声明", "主张—模块—证据反向映射", "分节角色复核", "发现质量、严重度与提交结论", "条件触发的外部检索与语言检查", "不可直接迁移的外部约束", "固定三至五天审稿时点", "不为任何结论提供证据"],
-    "paper-review/SKILL.md": ["提交画像与覆盖矩阵", "精确证据位置", "全文机械扫描不得以抽样代替", "最优先三项修复", "最终提交结论必须与未关闭问题一致"],
+    "paper-review/SKILL.md": ["提交画像与覆盖矩阵", "精确证据位置", "全文机械扫描不得以抽样代替", "最优先三项修复", "最终提交结论必须与未关闭问题一致", "摘要独立可读性", "结果解释闭环", "表格占位符语义"],
     "shared-references/academic_style_revision.md": ["语义风险分级", "强制后置润色闭环", "反向逐项核对", "只交付通过润色门禁"],
-    "paper-writing/SKILL.md": ["生成后强制润色", "不得直接交付初稿", "反向逐项核对"],
+    "paper-writing/SKILL.md": ["生成后强制润色", "不得直接交付初稿", "反向逐项核对", "摘要独立可读性检查", "Markdown加粗", "表格中的“—”必须在表注中定义唯一含义"],
     "shared-references/rule_authority_index.md": ["常驻基线", "规则权威来源", "按需加载矩阵", "不得无任务地批量加载全部历史文件", "初稿不得绕过后置润色直接交付"],
+    "paper-review/scripts/audit_paper_integrity.py": ["check_table_dash_cells", "表格占位符语义", "保留破折号时在该表表注中定义唯一含义"],
 }
 
 
@@ -196,9 +224,57 @@ def _validate_paper_review_reference_contract(root: Path, failures: list[str]) -
                 )
     return checks
 
+def _validate_stage_chain(root: Path, failures: list[str]) -> int:
+    """Check stage identity and dependency links, including copied skill suites."""
+    chain = root / "shared-references" / "MATH_MODELING_AGENT_PROMPT_CHAIN.md"
+    checks = 1
+    if not chain.is_file():
+        failures.append("missing canonical thirteen-stage chain")
+        return checks
+    text = chain.read_text(encoding="utf-8")
+    matches = list(re.finditer(r"(?m)^## 阶段 (\d+)：([^\n]+)", text))
+    checks += 1
+    if [int(m.group(1)) for m in matches] != list(range(1, 14)):
+        failures.append("canonical stage IDs must occur exactly once in order 1..13")
+    for i, match in enumerate(matches):
+        section = text[match.end():matches[i + 1].start() if i + 1 < len(matches) else len(text)]
+        for field in ("**调用 Skills：**", "**交接物：**", "**放行条件：**"):
+            checks += 1
+            if field not in section:
+                failures.append(f"stage {match.group(1)} missing {field}")
+        line = next((line for line in section.splitlines() if line.startswith("**调用 Skills：**")), "")
+        for skill in re.findall(r"`([a-z]+(?:-[a-z]+)+)`", line):
+            checks += 1
+            if skill not in SKILLS or not (root / skill / "SKILL.md").is_file():
+                failures.append(f"stage {match.group(1)} references unavailable skill {skill}")
+    entrypoints = [root / "shared-references" / "competition_workflow.md"]
+    workspace = root.parent.parent
+    if (workspace / "MODELING_AGENT_EXECUTION_PROTOCOL.md").is_file():
+        entrypoints.extend(workspace / name for name in ("AGENTS.md", "MODELING_AGENT_EXECUTION_PROTOCOL.md", "MATH_MODELING_AGENT_PROMPT_CHAIN.md"))
+    for path in entrypoints:
+        content = path.read_text(encoding="utf-8") if path.is_file() else ""
+        checks += 1
+        if "MATH_MODELING_AGENT_PROMPT_CHAIN.md" not in content:
+            failures.append(f"missing chain reference: {path}")
+        for target in re.findall(r"\[[^\]]+\]\(([^)]+\.md)(?:#[^)]*)?\)", content):
+            if "://" not in target:
+                checks += 1
+                if not (path.parent / target).resolve().is_file():
+                    failures.append(f"broken markdown link: {path}: {target}")
+    for path in root.rglob("*.md"):
+        checks += 1
+        content = path.read_text(encoding="utf-8")
+        if re.search(r"(?m)^#+[^\n]*(?:九阶段|9阶段)", content):
+            failures.append(f"obsolete stage sequence: {path}")
+        if path != chain and re.search(r"(?m)^## 阶段 \d+：", content):
+            failures.append(f"duplicate numbered stage definition: {path}")
+    return checks
+
+
 def validate(root: Path) -> dict:
     failures: list[str] = []
     checks = 0
+    checks += _validate_stage_chain(root, failures)
     checks += _validate_persistent_baseline(root, failures)
     checks += _validate_paper_writing_reference_contract(root, failures)
     checks += _validate_paper_review_reference_contract(root, failures)
@@ -245,8 +321,14 @@ def validate(root: Path) -> dict:
         if "rule_authority_index.md" not in content:
             failures.append(f"{name}: missing rule-authority index reference")
         checks += 1
+        if "paper_writing_revision_contract.md" not in content:
+            failures.append(f"{name}: missing persistent paper-writing revision contract reference")
+        checks += 1
         if REQUIRED_SKILL_GATE_PHRASE not in content:
             failures.append(f"{name}: missing common quality-closure hook")
+        checks += 1
+        if "Skill执行握手" not in content:
+            failures.append(f"{name}: missing mandatory skill-execution handshake")
 
     corpus = "\n".join(path.read_text(encoding="utf-8") for path in root.rglob("*.md"))
     for pattern in FORBIDDEN_DEFAULTS:
@@ -267,6 +349,7 @@ def validate(root: Path) -> dict:
                 failures.append(f"{relative_path}: missing guardrail phrase: {phrase}")
 
     required_refs = {
+        "MATH_MODELING_AGENT_PROMPT_CHAIN.md",
         "codex_project_context_rules.md",
         "historical_memory_usage_rules.md",
         "common_modeling_principles.md",
@@ -289,6 +372,7 @@ def validate(root: Path) -> dict:
         "agent_runtime_protocol.md",
         "artifact_build_release_protocol.md",
         "rule_authority_index.md",
+        "paper_writing_revision_contract.md",
         "supervisor_review_lens.md",
     }
     existing = {p.name for p in (root / "shared-references").glob("*.md")}

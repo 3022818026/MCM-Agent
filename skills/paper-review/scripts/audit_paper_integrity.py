@@ -9,10 +9,11 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 import re
 import tempfile
 import zipfile
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Iterable
 from xml.etree import ElementTree as ET
@@ -47,6 +48,7 @@ class DocumentData:
     tables: list[list[list[str]]]
     formulas: list[str]
     metadata: dict[str, str]
+    caption_paragraphs: list[str] = field(default_factory=list)
 
     @property
     def text(self) -> str:
@@ -63,6 +65,21 @@ def _texts(node: ET.Element, namespace: str) -> str:
 def read_docx(path: Path) -> DocumentData:
     with zipfile.ZipFile(path) as archive:
         document = ET.fromstring(archive.read("word/document.xml"))
+        caption_styles = {"Caption", "题注"}
+        if "word/styles.xml" in archive.namelist():
+            styles = ET.fromstring(archive.read("word/styles.xml"))
+            for style in styles.iter(f"{{{W_NS}}}style"):
+                name = style.find(f"{{{W_NS}}}name")
+                if name is not None and (name.get(f"{{{W_NS}}}val") or "").lower() in {"caption", "题注"}:
+                    caption_styles.add(style.get(f"{{{W_NS}}}styleId", ""))
+        caption_paragraphs = []
+        for paragraph in document.iter(f"{{{W_NS}}}p"):
+            style = paragraph.find(f"{{{W_NS}}}pPr/{{{W_NS}}}pStyle")
+            instructions = " ".join(node.text or "" for node in paragraph.iter(f"{{{W_NS}}}instrText"))
+            instructions += " " + " ".join(node.get(f"{{{W_NS}}}instr", "") for node in paragraph.iter(f"{{{W_NS}}}fldSimple"))
+            if ((style is not None and style.get(f"{{{W_NS}}}val") in caption_styles)
+                    or re.search(r"\bSEQ\s+(?:图|表|Figure|Table)\b", instructions, re.I)):
+                caption_paragraphs.append(_texts(paragraph, W_NS))
         paragraphs = [_texts(p, W_NS) for p in document.iter(f"{{{W_NS}}}p")]
         paragraphs = [text for text in paragraphs if text]
         tables: list[list[list[str]]] = []
@@ -91,7 +108,7 @@ def read_docx(path: Path) -> DocumentData:
                 node = core.find(tag)
                 if node is not None and node.text:
                     metadata[label] = node.text.strip()
-    return DocumentData(paragraphs, tables, formulas, metadata)
+    return DocumentData(paragraphs, tables, formulas, metadata, caption_paragraphs)
 
 
 def read_pdf(path: Path) -> tuple[str, int, dict[str, str]]:
@@ -135,22 +152,44 @@ def check_citations(text: str) -> list[Finding]:
     return findings
 
 
-def check_caption_sequence(paragraphs: Iterable[str]) -> list[Finding]:
-    sequences: dict[str, list[int]] = {"图": [], "表": []}
+def check_caption_sequence(
+    paragraphs: Iterable[str], confirmed_captions: Iterable[str] = (),
+) -> list[Finding]:
+    """Only explicit Word captions justify blockers; plain-text candidates need review."""
+    trusted = set(confirmed_captions)
+    sequences: dict[str, list[tuple[int, bool]]] = {"图": [], "表": []}
+    findings: list[Finding] = []
+    reference_start = re.compile(r"^(?:表明|显示|说明|反映|可见|给出|展示|描述|比较|对应|中|所示|为|的|与|和|及)")
     for paragraph in paragraphs:
         match = CAPTION_PATTERN.match(paragraph)
-        if match:
-            sequences[match.group(1)].append(int(match.group(2)))
-    findings: list[Finding] = []
-    for kind, values in sequences.items():
+        if not match:
+            continue
+        tail = paragraph[match.end():]
+        confirmed = paragraph in trusted
+        if not confirmed:
+            if reference_start.match(tail.lstrip()) or tail.startswith(("，", "。", ",", ".", "、")):
+                continue
+            if not re.match(r"^[ \t:：]+\S", tail):
+                findings.append(Finding("warning", "图表题注识别", paragraph,
+                                        "无法确认是题注还是正文引用；人工核对，不自动阻断。"))
+                continue
+        sequences[match.group(1)].append((int(match.group(2)), confirmed))
+    for kind, entries in sequences.items():
+        values = [value for value, _ in entries]
         if not values:
             continue
         duplicates = sorted({value for value in values if values.count(value) > 1})
         missing = sorted(set(range(1, max(values) + 1)) - set(values))
         if duplicates:
-            findings.append(Finding("blocker", f"{kind}编号", f"重复编号：{duplicates}", "按正文顺序重新编号。"))
+            reliable = any(sum(value == duplicate and known for value, known in entries) > 1
+                           for duplicate in duplicates)
+            findings.append(Finding("blocker" if reliable else "warning", f"{kind}编号",
+                                    f"重复编号：{duplicates}", "核对题注身份后按正文顺序重新编号。"))
         if missing:
-            findings.append(Finding("warning", f"{kind}编号", f"缺失编号：{missing}", "确认是否漏项或编号错误。"))
+            findings.append(Finding("warning", f"{kind}编号", f"缺失编号：{missing}", "确认是否漏项、局部摘录或编号错误。"))
+        if any(right < left for left, right in zip(values, values[1:])):
+            findings.append(Finding("blocker" if all(known for _, known in entries) else "warning",
+                                    f"{kind}编号", f"出现顺序错误：{values}", "核对题注并按实际出现顺序编号。"))
     return findings
 
 
@@ -203,6 +242,23 @@ def check_abstract_numbers(paragraphs: list[str]) -> list[Finding]:
     )]
 
 
+def check_table_dash_cells(tables: list[list[list[str]]]) -> list[Finding]:
+    locations: list[str] = []
+    for table_index, table in enumerate(tables, 1):
+        for row_index, row in enumerate(table, 1):
+            for column_index, cell in enumerate(row, 1):
+                if cell.strip() in {"—", "–", "-"}:
+                    locations.append(f"表{table_index}第{row_index}行第{column_index}列")
+    if not locations:
+        return []
+    evidence = "、".join(locations[:30])
+    if len(locations) > 30:
+        evidence += f"等共{len(locations)}处"
+    return [Finding(
+        "warning", "表格占位符语义", evidence,
+        "逐项确认含义；优先改写为“无数据”“不适用”“未计算”或“无有效样本”，保留破折号时在该表表注中定义唯一含义。",
+    )]
+
 def check_identity(text: str, metadata: dict[str, str], user_path: str = "") -> list[Finding]:
     findings: list[Finding] = []
     if any(value.strip() for value in metadata.values()):
@@ -215,50 +271,179 @@ def check_identity(text: str, metadata: dict[str, str], user_path: str = "") -> 
     return findings
 
 
-def flatten_numeric(data: Any, prefix: str = "") -> dict[str, float]:
-    output: dict[str, float] = {}
-    if isinstance(data, dict):
-        for key, value in data.items():
-            output.update(flatten_numeric(value, f"{prefix}.{key}" if prefix else str(key)))
-    elif isinstance(data, list):
-        for index, value in enumerate(data):
-            output.update(flatten_numeric(value, f"{prefix}[{index}]"))
-    elif isinstance(data, (int, float)) and not isinstance(data, bool):
-        output[prefix] = float(data)
-    return output
+# Record identity is independent of container names and row order. Versions are
+# compared as metadata so a stale version cannot be silently treated as another result.
+IDENTITY_FIELDS = ("result_id", "problem_id", "metric", "scenario_id", "fold_id")
+META_FIELDS = {"unit", "version", "data_version", "model_version", "processor_version", "split_id", "run_id", "status"}
+TEXT_FIELDS = {"name", "description", "notes", "source", "path", "label"}
+NUMERIC_TEXT = re.compile(r"^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$")
 
 
-def load_results(path: Path) -> dict[str, float]:
-    if path.suffix.lower() == ".json":
-        return flatten_numeric(json.loads(path.read_text(encoding="utf-8-sig")))
-    if path.suffix.lower() == ".csv":
-        with path.open("r", encoding="utf-8-sig", newline="") as stream:
-            return flatten_numeric(list(csv.DictReader(stream)))
-    raise ValueError(f"仅支持 JSON/CSV：{path}")
+@dataclass
+class ResultData:
+    values: dict[str, float] = field(default_factory=dict)
+    metadata: dict[str, dict[str, str]] = field(default_factory=dict)
+    findings: list[Finding] = field(default_factory=list)
 
 
-def compare_results(registry: Path, result_files: list[Path], tolerance: float) -> list[Finding]:
+def load_results(path: Path) -> ResultData:
+    result = ResultData()
+    def issue(message: str, severity: str = "blocker") -> None:
+        result.findings.append(Finding(severity, "结果文件读取", f"{path.name}: {message}",
+                                       "按结果ID整理JSON/CSV；保留真实值并明确缺失或未核验原因。"))
+    def unique_object(pairs: list[tuple[str, Any]]) -> dict:
+        output: dict = {}
+        for key, value in pairs:
+            if key in output:
+                raise ValueError(f"重复JSON字段：{key}")
+            output[key] = value
+        return output
+    try:
+        if path.suffix.lower() == ".json":
+            data = json.loads(path.read_text(encoding="utf-8-sig"), object_pairs_hook=unique_object)
+        elif path.suffix.lower() == ".csv":
+            with path.open("r", encoding="utf-8-sig", newline="") as stream:
+                reader = csv.DictReader(stream)
+                headers = reader.fieldnames or []
+                if not headers or any(not key.strip() for key in headers) or len(set(headers)) != len(headers):
+                    raise ValueError("CSV表头缺失、空白或重复")
+                rows = list(reader)
+                if any(None in row or any(value is None for value in row.values()) for row in rows):
+                    raise ValueError("CSV行宽与表头不一致")
+                if len(rows) > 1 and "result_id" not in headers:
+                    raise ValueError("多行CSV必须提供result_id，不能按不明行序匹配")
+                data = rows[0] if len(rows) == 1 else rows
+        else:
+            raise ValueError("仅支持JSON/CSV")
+    except (OSError, ValueError, csv.Error) as exc:
+        issue(str(exc))
+        return result
+    seen_records: set[str] = set()
+    def walk(value: Any, parts: tuple[str, ...] = (), scope: str = "", meta: dict[str, str] | None = None) -> None:
+        meta = dict(meta or {})
+        if isinstance(value, dict):
+            meta.update({key: str(value[key]) for key in META_FIELDS if key in value})
+            if "result_id" in value:
+                if value["result_id"] is None or isinstance(value["result_id"], (bool, dict, list)) or not str(value["result_id"]).strip():
+                    issue("result_id必须是非空标识")
+                    return
+                identity = [(key, str(value[key])) for key in IDENTITY_FIELDS if key in value]
+                scope = json.dumps(identity, ensure_ascii=False, separators=(",", ":"))
+                if scope in seen_records:
+                    issue(f"重复结果身份：{scope}")
+                    return
+                seen_records.add(scope)
+                parts = ()
+            for key, item in value.items():
+                if key not in META_FIELDS and key not in TEXT_FIELDS and not (scope and key in IDENTITY_FIELDS):
+                    walk(item, parts + (str(key),), scope, meta)
+        elif isinstance(value, list):
+            for index, item in enumerate(value):
+                walk(item, parts + (str(index),), scope, meta)
+        else:
+            key = json.dumps([scope, list(parts)], ensure_ascii=False, separators=(",", ":"))
+            if isinstance(value, str):
+                text = value.strip()
+                if NUMERIC_TEXT.fullmatch(text) or text.lower() in {"nan", "inf", "+inf", "-inf", "infinity", "+infinity", "-infinity"}:
+                    value = float(text)
+                else:
+                    issue(f"{key} 未核验：非数值或空字段 {value!r}", "warning")
+                    return
+            if value is None or isinstance(value, bool) or not isinstance(value, (int, float)):
+                issue(f"{key} 缺少有效数值：{value!r}")
+                return
+            try:
+                finite_value = float(value)
+            except (OverflowError, ValueError):
+                issue(f"{key} 数值超出可核验范围")
+                return
+            if not math.isfinite(finite_value):
+                issue(f"{key} 包含NaN或无穷值")
+                return
+            if key in result.values:
+                issue(f"重复数值键：{key}")
+                return
+            result.values[key] = finite_value
+            result.metadata[key] = meta
+    walk(data)
+    if not result.values:
+        issue("没有可核验的有限数值")
+    return result
+
+
+def compare_results(
+    registry: Path, result_files: list[Path], tolerance: float,
+    coverage: dict[str, Any] | None = None,
+) -> list[Finding]:
+    if not math.isfinite(tolerance) or tolerance < 0:
+        raise ValueError("tolerance必须为有限非负数")
     reference = load_results(registry)
-    leaves: dict[str, list[tuple[str, float]]] = {}
-    for key, value in reference.items():
-        leaves.setdefault(key.split(".")[-1], []).append((key, value))
-    findings: list[Finding] = []
+    findings = list(reference.findings)
+    matched: set[str] = set()
+    observed: set[str] = set()
+    unmatched_output: list[str] = []
+    output_count = 0
+    files = []
+    datasets = [("注册表", reference)]
+    if not result_files:
+        findings.append(Finding("warning", "数值核验覆盖", "未检查：没有提供代码结果文件",
+                                "提供本轮实际输出；仅有注册表不能视为数值一致性通过。"))
     for path in result_files:
-        for key, value in load_results(path).items():
-            candidates = leaves.get(key.split(".")[-1], [])
-            if len(candidates) != 1:
+        actual = load_results(path)
+        findings += actual.findings
+        datasets.append((path.name, actual))
+        file_matched = 0
+        output_count += len(actual.values)
+        for key, value in actual.values.items():
+            if key in observed:
+                findings.append(Finding("blocker", "重复结果来源", f"{path.name}: {key}",
+                                        "指定每个结果的唯一最终输出，消除跨文件重复。"))
+            observed.add(key)
+            if key not in reference.values:
+                unmatched_output.append(f"{path.name}:{key}")
                 continue
-            ref_key, ref_value = candidates[0]
-            if abs(ref_value - value) > tolerance * max(1.0, abs(ref_value), abs(value)):
-                findings.append(Finding(
-                    "blocker", "代码结果—注册表",
-                    f"{path.name}:{key}={value}，注册表{ref_key}={ref_value}",
-                    "重新运行唯一最终入口，并同步注册表、图表和正文。",
-                ))
+            matched.add(key)
+            file_matched += 1
+            ref_value = reference.values[key]
+            if not math.isclose(ref_value, value, rel_tol=tolerance, abs_tol=tolerance):
+                findings.append(Finding("blocker", "代码结果—注册表",
+                                        f"{path.name}:{key}={value}，注册表={ref_value}",
+                                        "重新运行唯一最终入口，并同步注册表、图表和正文。"))
+            left_meta, right_meta = reference.metadata[key], actual.metadata[key]
+            for label in (left_meta.keys() | right_meta.keys()) - {"status"}:
+                if label not in left_meta or label not in right_meta:
+                    findings.append(Finding("warning", "结果元数据覆盖", f"{path.name}:{key} 缺少对应{label}",
+                                            "在双方记录单位、版本与运行身份后复核。"))
+                elif left_meta[label] != right_meta[label]:
+                    findings.append(Finding("blocker", "结果元数据一致性", f"{path.name}:{key} {label}: {left_meta[label]} != {right_meta[label]}",
+                                            "确认同一单位、数据版本与最终运行；禁止静默换算或混用旧结果。"))
+        files.append({"path": str(path), "numeric_fields": len(actual.values), "matched_fields": file_matched})
+    for label, data in datasets:
+        for key, meta in data.metadata.items():
+            allowed = {"verified", "published", "已核验", "已发布"}
+            if label != "注册表":
+                allowed |= {"success", "succeeded", "ok", "optimal", "feasible", "运行成功", "求解成功"}
+            status = meta.get("status", "").strip().lower()
+            if "status" in meta and status not in allowed:
+                failed = status in {"failed", "failure", "error", "invalid", "cancelled", "canceled", "失败", "取消", "已失效"}
+                findings.append(Finding("blocker" if failed else "warning", "结果核验状态",
+                                        f"{label}:{key} status={meta['status']}",
+                                        "核对状态含义；失败或未核验结果不得作为已核验结论发布。"))
+    missing = sorted(reference.values.keys() - matched)
+    if missing or unmatched_output:
+        findings.append(Finding("warning", "数值核验覆盖",
+                                f"未检查注册项：{missing}；未匹配输出项：{unmatched_output}",
+                                "按完整字段路径或result_id及指标身份对齐；缺失项不得计为通过。"))
+    if coverage is not None:
+        coverage.update({"registry_numeric_fields": len(reference.values), "output_numeric_fields": output_count,
+                         "matched_fields": len(matched), "unmatched_registry": missing,
+                         "unmatched_output": unmatched_output, "files": files,
+                         "status": "failed" if any(f.severity == "blocker" for f in findings) else
+                                   "not_checked" if not matched else "partial" if findings else "passed"})
     return findings
 
 
-def make_report(findings: list[Finding], inputs: dict[str, str]) -> str:
+def make_report(findings: list[Finding], inputs: dict[str, str], coverage: dict[str, Any] | None = None) -> str:
     blockers = sum(item.severity == "blocker" for item in findings)
     warnings = sum(item.severity == "warning" for item in findings)
     lines = [
@@ -267,6 +452,7 @@ def make_report(findings: list[Finding], inputs: dict[str, str]) -> str:
         f"- 输入：{json.dumps(inputs, ensure_ascii=False)}", "",
         "自动初筛不能替代人工复核模型机理、数据边界、结论强度和最终版式。", "",
     ]
+    lines += ["- 数值核验覆盖：" + json.dumps(coverage or {"status": "not_checked", "reason": "未提供结果注册表"}, ensure_ascii=False), ""]
     if not findings:
         lines.append("未发现自动规则可识别的问题。")
     for index, item in enumerate(findings, 1):
@@ -289,6 +475,8 @@ def self_test() -> None:
         registry.write_text('{"profit": 100}', encoding="utf-8")
         result.write_text('{"profit": 101}', encoding="utf-8")
         assert compare_results(registry, [result], 1e-9)
+    dash_findings = check_table_dash_cells([[['指标', '结果'], ['A', '—']]])
+    assert any(item.check == "表格占位符语义" for item in dash_findings)
     print("self-test: pass")
 
 
@@ -308,19 +496,25 @@ def main() -> None:
     if args.self_test:
         self_test()
         return
+    if not math.isfinite(args.tolerance) or args.tolerance < 0:
+        parser.error("--tolerance必须为有限非负数")
+    if args.code_result and not args.result_registry:
+        parser.error("--code-result需要同时提供--result-registry")
     if not any((args.docx, args.pdf, args.result_registry)):
         parser.error("至少提供 --docx、--pdf 或 --result-registry 之一。")
 
     findings: list[Finding] = []
     inputs: dict[str, str] = {}
+    coverage: dict[str, Any] = {}
     if args.docx:
         data = read_docx(args.docx)
         inputs["docx"] = str(args.docx)
         findings += check_placeholders(data.text)
         findings += check_citations(data.text)
-        findings += check_caption_sequence(data.paragraphs)
+        findings += check_caption_sequence(data.paragraphs, data.caption_paragraphs)
         findings += check_symbol_candidates(data)
         findings += check_abstract_numbers(data.paragraphs)
+        findings += check_table_dash_cells(data.tables)
         findings += check_identity(data.text, data.metadata, args.user_path)
     if args.pdf:
         pdf_text, pages, metadata = read_pdf(args.pdf)
@@ -336,9 +530,9 @@ def main() -> None:
     if args.result_registry:
         inputs["result_registry"] = str(args.result_registry)
         inputs["code_results"] = ", ".join(map(str, args.code_result))
-        findings += compare_results(args.result_registry, args.code_result, args.tolerance)
+        findings += compare_results(args.result_registry, args.code_result, args.tolerance, coverage)
 
-    report = make_report(findings, inputs)
+    report = make_report(findings, inputs, coverage)
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(report, encoding="utf-8")
@@ -348,7 +542,7 @@ def main() -> None:
         args.json_output.parent.mkdir(parents=True, exist_ok=True)
         args.json_output.write_text(
             json.dumps(
-                {"inputs": inputs, "findings": [asdict(item) for item in findings]},
+                {"inputs": inputs, "numeric_coverage": coverage or {"status": "not_checked"}, "findings": [asdict(item) for item in findings]},
                 ensure_ascii=False, indent=2,
             ),
             encoding="utf-8",
